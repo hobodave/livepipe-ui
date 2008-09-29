@@ -28,6 +28,7 @@ Control.Tabs = Class.create({
 			linkSelector: 'li a',
 			setClassOnContainer: false,
 			activeClassName: 'active',
+			inactiveClassName: 'inactive',
 			defaultTab: 'first',
 			autoLinkExternal: true,
 			targetRegExp: /#(.+)$/,
@@ -87,6 +88,15 @@ Control.Tabs = Class.create({
 			return false;
 		}.bind(this,link);
 	},
+	removeTab: function(link){
+	    var link_href = link.getAttribute('href');
+	    var foo = this.links.reject(function(l) {
+	        return link_href == l.getAttribute('href');
+	    });
+	    this.links = foo;
+        link.key = link_href.replace(window.location.href.split('#')[0],'').split('/').last().replace(/#/,'');
+        this.containers.unset(link.key);
+	},
 	setActiveTab: function(link){
 		if(!link && typeof(link) == 'undefined')
 			return;
@@ -103,8 +113,10 @@ Control.Tabs = Class.create({
 				this.options.hideFunction(this.activeContainer);
 			this.links.each(function(item){
 				(this.options.setClassOnContainer ? $(item.parentNode) : item).removeClassName(this.options.activeClassName);
+				(this.options.setClassOnContainer ? $(item.parentNode) : item).addClassName(this.options.inactiveClassName);
 			}.bind(this));
 			(this.options.setClassOnContainer ? $(link.parentNode) : link).addClassName(this.options.activeClassName);
+			(this.options.setClassOnContainer ? $(link.parentNode) : link).removeClassName(this.options.inactiveClassName);
 			this.activeContainer = this.containers.get(link.key);
 			this.activeLink = link;
 			this.options.showFunction(this.containers.get(link.key));
